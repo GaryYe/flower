@@ -44,12 +44,14 @@ message ServerMessage {
     Parameters parameters = 1;
     map<string, Scalar> config = 2;
   }
+  message GetStatus {}
 
   oneof msg {
     Reconnect reconnect = 1;
     GetParameters get_parameters = 2;
     FitIns fit_ins = 3;
     EvaluateIns evaluate_ins = 4;
+    GetStatus get_status = 5;
   }
 }
 
@@ -70,11 +72,17 @@ message ClientMessage {
     map<string, Scalar> metrics = 4;
   }
 
+  message StatusRes {
+    int64 cpu_speed = 1;
+
+  }
+
   oneof msg {
     Disconnect disconnect = 1;
     ParametersRes parameters_res = 2;
     FitRes fit_res = 3;
     EvaluateRes evaluate_res = 4;
+    StatusRes status_res = 5;
   }
 }
 

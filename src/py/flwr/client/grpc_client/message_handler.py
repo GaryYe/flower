@@ -31,6 +31,11 @@ class UnkownServerMessage(Exception):
 def handle(
     client: Client, server_msg: ServerMessage
 ) -> Tuple[ClientMessage, int, bool]:
+    """
+    ClientMessage: client_message
+    int: sleep_duration
+    boolean: keep_going
+    """
     if server_msg.HasField("reconnect"):
         disconnect_msg, sleep_duration = _reconnect(server_msg.reconnect)
         return disconnect_msg, sleep_duration, False
@@ -40,6 +45,8 @@ def handle(
         return _fit(client, server_msg.fit_ins), 0, True
     if server_msg.HasField("evaluate_ins"):
         return _evaluate(client, server_msg.evaluate_ins), 0, True
+    if server_msg.HasField("get_status"):
+        return _get_status(client), 0, True
     raise UnkownServerMessage()
 
 
@@ -49,6 +56,9 @@ def _get_parameters(client: Client) -> ClientMessage:
     parameters_res_proto = serde.parameters_res_to_proto(parameters_res)
     return ClientMessage(parameters_res=parameters_res_proto)
 
+def _get_status(client: Client) -> ClientMessage:
+    status_res = client.get_status()
+    return ClientMessage()
 
 def _fit(client: Client, fit_msg: ServerMessage.FitIns) -> ClientMessage:
     # Deserialize fit instruction

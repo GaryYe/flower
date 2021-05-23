@@ -11,9 +11,4 @@ python -m pip install -U setuptools==56.2.0
 python -m pip install -U poetry==1.1.6
 
 # Use `poetry` to install project dependencies
-python -m poetry install \
-  --extras "baseline" \
-  --extras "examples-pytorch" \
-  --extras "examples-tensorflow" \
-  --extras "http-logger" \
-  --extras "ops"
+python -m poetry install  --extras "baseline"  --extras "examples-pytorch"  --extras "examples-tensorflow"  --extras "http-logger"  --extras "ops"

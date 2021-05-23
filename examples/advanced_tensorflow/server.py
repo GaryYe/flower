@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import flwr as fl
 import tensorflow as tf
+from flwr.server.strategy.random_sampling import RandomSampling
 
 
 def main() -> None:
@@ -14,12 +15,13 @@ def main() -> None:
     model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
 
     # Create strategy
-    strategy = fl.server.strategy.FedAvg(
+
+    strategy = RandomSampling(
         fraction_fit=0.3,
         fraction_eval=0.2,
         min_fit_clients=3,
         min_eval_clients=2,
-        min_available_clients=10,
+        min_available_clients=4,
         eval_fn=get_eval_fn(model),
         on_fit_config_fn=fit_config,
         on_evaluate_config_fn=evaluate_config,
@@ -27,7 +29,7 @@ def main() -> None:
     )
 
     # Start Flower server for four rounds of federated learning
-    fl.server.start_server("[::]:8080", config={"num_rounds": 4}, strategy=strategy)
+    fl.server.start_server("127.0.0.1:8080", config={"num_rounds": 4}, strategy=strategy)
 
 
 def get_eval_fn(model):
