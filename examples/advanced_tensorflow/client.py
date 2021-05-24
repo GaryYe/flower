@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 
 import numpy as np
 import tensorflow as tf
@@ -69,8 +70,10 @@ class CifarClient(fl.client.NumPyClient):
 def main() -> None:
     # Parse command line argument `partition`
     parser = argparse.ArgumentParser(description="Flower")
-    parser.add_argument("--partition", type=int, choices=range(0, 10), required=True)
+    parser.add_argument("--partition", type=int, choices=range(0, 10), required=False)
     args = parser.parse_args()
+
+    partition = args.partition or random.randint(0, 9)
 
     # Load and compile Keras model
     model = tf.keras.applications.EfficientNetB0(
@@ -79,11 +82,12 @@ def main() -> None:
     model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
 
     # Load a subset of CIFAR-10 to simulate the local data partition
-    (x_train, y_train), (x_test, y_test) = load_partition(args.partition)
+    (x_train, y_train), (x_test, y_test) = load_partition(partition)
 
     # Start Flower client
     client = CifarClient(model, x_train, y_train, x_test, y_test)
-    fl.client.start_numpy_client("127.0.0.1:8080", client=client)
+    host = "server:8080"
+    fl.client.start_numpy_client(host, client=client)
 
 
 def load_partition(idx: int):
